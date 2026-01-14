@@ -1,0 +1,760 @@
+﻿==============================
+FICHIER : D:\ITU\L3\S5\MmeBaovola\compagnie-aerienne\src\main\project\beans\Aircraft.java
+==============================
+
+package main.project.beans;
+
+public class Aircraft {
+    private int id;
+    private String registration;
+    private String model;
+    private int totalSeats;
+
+    public Aircraft() {}
+
+    public Aircraft(int id, String registration, String model, int totalSeats) {
+        this.id = id;
+        this.registration = registration;
+        this.model = model;
+        this.totalSeats = totalSeats;
+    }
+
+    // Getters and Setters
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getRegistration() {
+        return registration;
+    }
+
+    public void setRegistration(String registration) {
+        this.registration = registration;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
+    public int getTotalSeats() {
+        return totalSeats;
+    }
+
+    public void setTotalSeats(int totalSeats) {
+        this.totalSeats = totalSeats;
+    }
+
+    @Override
+    public String toString() {
+        return registration + " - " + model + " (" + totalSeats + " siÃ¨ges)";
+    }
+}
+
+
+
+==============================
+FICHIER : D:\ITU\L3\S5\MmeBaovola\compagnie-aerienne\src\main\project\beans\Airport.java
+==============================
+
+package main.project.beans;
+
+public class Airport {
+    private int id;
+    private String code;
+    private String name;
+    private String city;
+    private String country;
+
+    public Airport() {}
+
+    public Airport(int id, String code, String name, String city, String country) {
+        this.id = id;
+        this.code = code;
+        this.name = name;
+        this.city = city;
+        this.country = country;
+    }
+
+    // Getters and Setters
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    @Override
+    public String toString() {
+        return code + " - " + name + " (" + city + ", " + country + ")";
+    }
+}
+
+
+
+==============================
+FICHIER : D:\ITU\L3\S5\MmeBaovola\compagnie-aerienne\src\main\project\beans\Booking.java
+==============================
+
+package main.project.beans;
+
+import java.sql.Timestamp;
+
+public class Booking {
+    private int id;
+    private String bookingReference;
+    private int flightId;
+    private int passengerId;
+    private String seatNumber;
+    private Timestamp bookingDate;
+    private double totalAmount;
+    private String status;
+
+    // Informations supplÃ©mentaires pour l'affichage
+    private Flight flight;
+    private Passenger passenger;
+
+    public Booking() {}
+
+    public Booking(int id, String bookingReference, int flightId, int passengerId,
+                   String seatNumber, Timestamp bookingDate, double totalAmount, String status) {
+        this.id = id;
+        this.bookingReference = bookingReference;
+        this.flightId = flightId;
+        this.passengerId = passengerId;
+        this.seatNumber = seatNumber;
+        this.bookingDate = bookingDate;
+        this.totalAmount = totalAmount;
+        this.status = status;
+    }
+
+    // Getters and Setters
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getBookingReference() {
+        return bookingReference;
+    }
+
+    public void setBookingReference(String bookingReference) {
+        this.bookingReference = bookingReference;
+    }
+
+    public int getFlightId() {
+        return flightId;
+    }
+
+    public void setFlightId(int flightId) {
+        this.flightId = flightId;
+    }
+
+    public int getPassengerId() {
+        return passengerId;
+    }
+
+    public void setPassengerId(int passengerId) {
+        this.passengerId = passengerId;
+    }
+
+    public String getSeatNumber() {
+        return seatNumber;
+    }
+
+    public void setSeatNumber(String seatNumber) {
+        this.seatNumber = seatNumber;
+    }
+
+    public Timestamp getBookingDate() {
+        return bookingDate;
+    }
+
+    public void setBookingDate(Timestamp bookingDate) {
+        this.bookingDate = bookingDate;
+    }
+
+    public double getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(double totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Flight getFlight() {
+        return flight;
+    }
+
+    public void setFlight(Flight flight) {
+        this.flight = flight;
+    }
+
+    public Passenger getPassenger() {
+        return passenger;
+    }
+
+    public void setPassenger(Passenger passenger) {
+        this.passenger = passenger;
+    }
+}
+
+
+
+==============================
+FICHIER : D:\ITU\L3\S5\MmeBaovola\compagnie-aerienne\src\main\project\beans\Employee.java
+==============================
+
+package main.project.beans;
+
+public class Employee {
+    private int id;
+    private String username;
+    private String password;
+    private String fullName;
+    private String role;
+
+    public Employee() {}
+
+    public Employee(int id, String username, String password, String fullName, String role) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.fullName = fullName;
+        this.role = role;
+    }
+
+    // Getters and Setters
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public boolean isAdmin() {
+        return "admin".equals(role);
+    }
+
+    public boolean isAccountant() {
+        return "accountant".equals(role);
+    }
+
+    public boolean isStaff() {
+        return "staff".equals(role);
+    }
+}
+
+
+
+==============================
+FICHIER : D:\ITU\L3\S5\MmeBaovola\compagnie-aerienne\src\main\project\beans\Flight.java
+==============================
+
+package main.project.beans;
+
+import java.sql.Timestamp;
+
+public class Flight {
+    private int id;
+    private String flightNumber;
+    private int departureAirportId;
+    private int arrivalAirportId;
+    private Timestamp departureTime;
+    private Timestamp arrivalTime;
+    private int aircraftId;
+    private double basePrice;
+    private String status;
+
+    // Informations supplÃ©mentaires pour l'affichage
+    private Airport departureAirport;
+    private Airport arrivalAirport;
+    private Aircraft aircraft;
+
+    public Flight() {}
+
+    public Flight(int id, String flightNumber, int departureAirportId, int arrivalAirportId,
+                  Timestamp departureTime, Timestamp arrivalTime, int aircraftId,
+                  double basePrice, String status) {
+        this.id = id;
+        this.flightNumber = flightNumber;
+        this.departureAirportId = departureAirportId;
+        this.arrivalAirportId = arrivalAirportId;
+        this.departureTime = departureTime;
+        this.arrivalTime = arrivalTime;
+        this.aircraftId = aircraftId;
+        this.basePrice = basePrice;
+        this.status = status;
+    }
+
+    // Getters and Setters
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getFlightNumber() {
+        return flightNumber;
+    }
+
+    public void setFlightNumber(String flightNumber) {
+        this.flightNumber = flightNumber;
+    }
+
+    public int getDepartureAirportId() {
+        return departureAirportId;
+    }
+
+    public void setDepartureAirportId(int departureAirportId) {
+        this.departureAirportId = departureAirportId;
+    }
+
+    public int getArrivalAirportId() {
+        return arrivalAirportId;
+    }
+
+    public void setArrivalAirportId(int arrivalAirportId) {
+        this.arrivalAirportId = arrivalAirportId;
+    }
+
+    public Timestamp getDepartureTime() {
+        return departureTime;
+    }
+
+    public void setDepartureTime(Timestamp departureTime) {
+        this.departureTime = departureTime;
+    }
+
+    public Timestamp getArrivalTime() {
+        return arrivalTime;
+    }
+
+    public void setArrivalTime(Timestamp arrivalTime) {
+        this.arrivalTime = arrivalTime;
+    }
+
+    public int getAircraftId() {
+        return aircraftId;
+    }
+
+    public void setAircraftId(int aircraftId) {
+        this.aircraftId = aircraftId;
+    }
+
+    public double getBasePrice() {
+        return basePrice;
+    }
+
+    public void setBasePrice(double basePrice) {
+        this.basePrice = basePrice;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Airport getDepartureAirport() {
+        return departureAirport;
+    }
+
+    public void setDepartureAirport(Airport departureAirport) {
+        this.departureAirport = departureAirport;
+    }
+
+    public Airport getArrivalAirport() {
+        return arrivalAirport;
+    }
+
+    public void setArrivalAirport(Airport arrivalAirport) {
+        this.arrivalAirport = arrivalAirport;
+    }
+
+    public Aircraft getAircraft() {
+        return aircraft;
+    }
+
+    public void setAircraft(Aircraft aircraft) {
+        this.aircraft = aircraft;
+    }
+}
+
+
+
+==============================
+FICHIER : D:\ITU\L3\S5\MmeBaovola\compagnie-aerienne\src\main\project\beans\FlightInstance.java
+==============================
+
+package main.project.beans;
+
+import java.sql.Timestamp;
+import java.util.Date;
+
+public class FlightInstance {
+    private int id;
+    private int routeId;
+    private int aircraftId;
+    private Timestamp departureTime;
+    private Timestamp arrivalTime;
+    private Date flightDate;
+    private double basePrice;
+    private String status;
+
+    private FlightRoute route;
+    private Aircraft aircraft;
+
+    public FlightInstance() {}
+
+    public FlightInstance(int id, int routeId, int aircraftId, Timestamp departureTime, Timestamp arrivalTime,
+                          Date flightDate, double basePrice, String status) {
+        this.id = id;
+        this.routeId = routeId;
+        this.aircraftId = aircraftId;
+        this.departureTime = departureTime;
+        this.arrivalTime = arrivalTime;
+        this.flightDate = flightDate;
+        this.basePrice = basePrice;
+        this.status = status;
+    }
+
+    // Getters & Setters
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+    public int getRouteId() { return routeId; }
+    public void setRouteId(int routeId) { this.routeId = routeId; }
+    public int getAircraftId() { return aircraftId; }
+    public void setAircraftId(int aircraftId) { this.aircraftId = aircraftId; }
+    public Timestamp getDepartureTime() { return departureTime; }
+    public void setDepartureTime(Timestamp departureTime) { this.departureTime = departureTime; }
+    public Timestamp getArrivalTime() { return arrivalTime; }
+    public void setArrivalTime(Timestamp arrivalTime) { this.arrivalTime = arrivalTime; }
+    public Date getFlightDate() { return flightDate; }
+    public void setFlightDate(Date flightDate) { this.flightDate = flightDate; }
+    public double getBasePrice() { return basePrice; }
+    public void setBasePrice(double basePrice) { this.basePrice = basePrice; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+    public FlightRoute getRoute() { return route; }
+    public void setRoute(FlightRoute route) { this.route = route; }
+    public Aircraft getAircraft() { return aircraft; }
+    public void setAircraft(Aircraft aircraft) { this.aircraft = aircraft; }
+}
+
+
+
+==============================
+FICHIER : D:\ITU\L3\S5\MmeBaovola\compagnie-aerienne\src\main\project\beans\FlightRoute.java
+==============================
+
+package main.project.beans;
+
+public class FlightRoute {
+    private int id;
+    private String flightNumber;
+    private int departureAirportId;
+    private int arrivalAirportId;
+
+    private Airport departureAirport;
+    private Airport arrivalAirport;
+
+    public FlightRoute() {}
+
+    public FlightRoute(int id, String flightNumber, int departureAirportId, int arrivalAirportId) {
+        this.id = id;
+        this.flightNumber = flightNumber;
+        this.departureAirportId = departureAirportId;
+        this.arrivalAirportId = arrivalAirportId;
+    }
+
+    // Getters & Setters
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+    public String getFlightNumber() { return flightNumber; }
+    public void setFlightNumber(String flightNumber) { this.flightNumber = flightNumber; }
+    public int getDepartureAirportId() { return departureAirportId; }
+    public void setDepartureAirportId(int departureAirportId) { this.departureAirportId = departureAirportId; }
+    public int getArrivalAirportId() { return arrivalAirportId; }
+    public void setArrivalAirportId(int arrivalAirportId) { this.arrivalAirportId = arrivalAirportId; }
+    public Airport getDepartureAirport() { return departureAirport; }
+    public void setDepartureAirport(Airport departureAirport) { this.departureAirport = departureAirport; }
+    public Airport getArrivalAirport() { return arrivalAirport; }
+    public void setArrivalAirport(Airport arrivalAirport) { this.arrivalAirport = arrivalAirport; }
+}
+
+
+
+==============================
+FICHIER : D:\ITU\L3\S5\MmeBaovola\compagnie-aerienne\src\main\project\beans\Passenger.java
+==============================
+
+package main.project.beans;
+
+import java.sql.Date;
+
+public class Passenger {
+    private int id;
+    private String firstName;
+    private String lastName;
+    private String email;
+    private String phone;
+    private String passportNumber;
+    private Date dateOfBirth;
+
+    public Passenger() {}
+
+    public Passenger(int id, String firstName, String lastName, String email,
+                     String phone, String passportNumber, Date dateOfBirth) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.phone = phone;
+        this.passportNumber = passportNumber;
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    // Getters and Setters
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getPassportNumber() {
+        return passportNumber;
+    }
+
+    public void setPassportNumber(String passportNumber) {
+        this.passportNumber = passportNumber;
+    }
+
+    public Date getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(Date dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    public String getFullName() {
+        return firstName + " " + lastName;
+    }
+}
+
+
+
+==============================
+FICHIER : D:\ITU\L3\S5\MmeBaovola\compagnie-aerienne\src\main\project\beans\Payment.java
+==============================
+
+package main.project.beans;
+
+import java.sql.Timestamp;
+
+public class Payment {
+    private int id;
+    private int bookingId;
+    private Timestamp paymentDate;
+    private double amount;
+    private String paymentMethod;
+    private String status;
+
+    // Information supplÃ©mentaire
+    private Booking booking;
+
+    public Payment() {}
+
+    public Payment(int id, int bookingId, Timestamp paymentDate,
+                   double amount, String paymentMethod, String status) {
+        this.id = id;
+        this.bookingId = bookingId;
+        this.paymentDate = paymentDate;
+        this.amount = amount;
+        this.paymentMethod = paymentMethod;
+        this.status = status;
+    }
+
+    // Getters and Setters
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getBookingId() {
+        return bookingId;
+    }
+
+    public void setBookingId(int bookingId) {
+        this.bookingId = bookingId;
+    }
+
+    public Timestamp getPaymentDate() {
+        return paymentDate;
+    }
+
+    public void setPaymentDate(Timestamp paymentDate) {
+        this.paymentDate = paymentDate;
+    }
+
+    public double getAmount() {
+        return amount;
+    }
+
+    public void setAmount(double amount) {
+        this.amount = amount;
+    }
+
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Booking getBooking() {
+        return booking;
+    }
+
+    public void setBooking(Booking booking) {
+        this.booking = booking;
+    }
+}
+
+
+

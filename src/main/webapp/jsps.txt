@@ -1,0 +1,2300 @@
+﻿==============================
+FICHIER : D:\ITU\L3\S5\MmeBaovola\compagnie-aerienne\src\main\webapp\index.jsp
+==============================
+
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%
+    response.sendRedirect(request.getContextPath() + "/login");
+%>
+
+
+
+==============================
+FICHIER : D:\ITU\L3\S5\MmeBaovola\compagnie-aerienne\src\main\webapp\WEB-INF\jsp\dashboard.jsp
+==============================
+
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="main.project.beans.Employee" %>
+<%
+    Employee employee = (Employee) session.getAttribute("employee");
+    if (employee == null) {
+        response.sendRedirect("login");
+        return;
+    }
+%>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - GCA Airlines</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="dashboard">âœˆï¸ GCA Airlines</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link active" href="dashboard">Accueil</a>
+                </li>
+                <% if (employee.isAdmin() || employee.isStaff()) { %>
+                <li class="nav-item">
+                    <a class="nav-link" href="flight-instances">Vols</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="bookings">RÃ©servations</a>
+                </li>
+                <% } %>
+                <% if (employee.isAccountant() || employee.isAdmin()) { %>
+                <li class="nav-item">
+                    <a class="nav-link" href="payments">Finances</a>
+                </li>
+                <% } %>
+            </ul>
+            <span class="navbar-text me-3">
+                    <%= employee.getFullName() %> (<%= employee.getRole() %>)
+                </span>
+            <a href="logout" class="btn btn-outline-light btn-sm">DÃ©connexion</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-5">
+    <%
+        String successMessage = (String) session.getAttribute("successMessage");
+        if (successMessage != null) {
+            session.removeAttribute("successMessage");
+    %>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <%= successMessage %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <% } %>
+
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">Tableau de bord</h1>
+            <p class="lead">Bienvenue <%= employee.getFullName() %></p>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <% if (employee.isAdmin() || employee.isStaff()) { %>
+        <div class="col-md-4 mb-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h5 class="card-title">ðŸ“‹ Gestion des Vols</h5>
+                    <p class="card-text">CrÃ©er, modifier et consulter les vols</p>
+                    <a href="flights" class="btn btn-light">AccÃ©der</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5 class="card-title">ðŸŽ« RÃ©servations</h5>
+                    <p class="card-text">GÃ©rer les passagers et rÃ©servations</p>
+                    <a href="bookings" class="btn btn-light">AccÃ©der</a>
+                </div>
+            </div>
+        </div>
+        <% } %>
+
+        <% if (employee.isAccountant() || employee.isAdmin()) { %>
+        <div class="col-md-4 mb-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <h5 class="card-title">ðŸ’° Finances</h5>
+                    <p class="card-text">Consulter les paiements et rapports</p>
+                    <a href="payments" class="btn btn-light">AccÃ©der</a>
+                </div>
+            </div>
+        </div>
+        <% } %>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+
+
+==============================
+FICHIER : D:\ITU\L3\S5\MmeBaovola\compagnie-aerienne\src\main\webapp\WEB-INF\jsp\login.jsp
+==============================
+
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Airline Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<div class="container">
+    <div class="row justify-content-center align-items-center min-vh-100">
+        <div class="col-md-5">
+            <div class="card shadow">
+                <div class="card-body p-5">
+                    <h2 class="text-center mb-4">âœˆï¸ GCA Airlines</h2>
+                    <h5 class="text-center text-muted mb-4">SystÃ¨me de Gestion</h5>
+
+                    <% if (request.getAttribute("errorMessage") != null) { %>
+                    <div class="alert alert-danger" role="alert">
+                        <%= request.getAttribute("errorMessage") %>
+                    </div>
+                    <% } %>
+
+                    <form method="post" action="login">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Nom d'utilisateur</label>
+                            <input type="text" class="form-control" id="username" name="username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Mot de passe</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Se connecter</button>
+                    </form>
+
+                    <div class="mt-4 text-center">
+                        <small class="text-muted">
+                            <strong>Comptes de test:</strong><br>
+                            admin/admin123 | staff1/staff123 | compta/compta123
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+
+
+==============================
+FICHIER : D:\ITU\L3\S5\MmeBaovola\compagnie-aerienne\src\main\webapp\WEB-INF\jsp\navbar.jsp
+==============================
+
+<%@ page import="main.project.beans.Employee" %>
+<%
+    Employee navEmployee = (Employee) session.getAttribute("employee");
+%>
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="dashboard">âœˆï¸ GCA Airlines</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="dashboard">Accueil</a>
+                </li>
+                <% if (navEmployee != null && (navEmployee.isAdmin() || navEmployee.isStaff())) { %>
+                <li class="nav-item">
+                    <a class="nav-link" href="flight-instances">Vols</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="bookings">RÃ©servations</a>
+                </li>
+                <% } %>
+                <% if (navEmployee != null && (navEmployee.isAccountant() || navEmployee.isAdmin())) { %>
+                <li class="nav-item">
+                    <a class="nav-link" href="payments">Finances</a>
+                </li>
+                <% } %>
+            </ul>
+            <% if (navEmployee != null) { %>
+            <span class="navbar-text me-3">
+                <%= navEmployee.getFullName() %> (<%= navEmployee.getRole() %>)
+            </span>
+            <a href="logout" class="btn btn-outline-light btn-sm">DÃ©connexion</a>
+            <% } %>
+        </div>
+    </div>
+</nav>
+
+
+
+==============================
+FICHIER : D:\ITU\L3\S5\MmeBaovola\compagnie-aerienne\src\main\webapp\WEB-INF\jsp\bookings\listBookings.jsp
+==============================
+
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="main.project.beans.*" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.text.SimpleDateFormat" %>
+<%
+    List<Booking> bookings = (List<Booking>) request.getAttribute("bookings");
+    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+    
+    // RÃ©cupÃ©ration des paramÃ¨tres de filtre
+    String filterPassenger = request.getParameter("filterPassenger") != null ? request.getParameter("filterPassenger") : "";
+    String filterFlight = request.getParameter("filterFlight") != null ? request.getParameter("filterFlight") : "";
+    String filterStatus = request.getParameter("filterStatus") != null ? request.getParameter("filterStatus") : "";
+%>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des RÃ©servations - GCA Airlines</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .filter-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<%@ include file="../navbar.jsp" %>
+
+<div class="container mt-4">
+    <%
+        String successMessage = (String) session.getAttribute("successMessage");
+        String errorMessage = (String) session.getAttribute("errorMessage");
+        if (successMessage != null) {
+            session.removeAttribute("successMessage");
+    %>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <%= successMessage %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <% }
+        if (errorMessage != null) {
+            session.removeAttribute("errorMessage");
+    %>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <%= errorMessage %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <% } %>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>ðŸŽ« Gestion des RÃ©servations</h2>
+        <a href="bookings?action=new" class="btn btn-primary">âž• Nouvelle rÃ©servation</a>
+    </div>
+
+    <!-- Section des filtres -->
+    <div class="filter-section">
+        <h5 class="mb-3">ðŸ” Filtrer les rÃ©servations</h5>
+        <form method="GET" action="bookings" class="row g-3">
+            <div class="col-md-4">
+                <label for="filterPassenger" class="form-label">Passager</label>
+                <input type="text" class="form-control" id="filterPassenger" name="filterPassenger" 
+                       placeholder="Nom ou prÃ©nom" value="<%= filterPassenger %>">
+            </div>
+            <div class="col-md-3">
+                <label for="filterFlight" class="form-label">NumÃ©ro de vol</label>
+                <input type="text" class="form-control" id="filterFlight" name="filterFlight" 
+                       placeholder="Ex: AF123" value="<%= filterFlight %>">
+            </div>
+            <div class="col-md-3">
+                <label for="filterStatus" class="form-label">Statut</label>
+                <select class="form-select" id="filterStatus" name="filterStatus">
+                    <option value="">Tous les statuts</option>
+                    <option value="confirmed" <%= "confirmed".equals(filterStatus) ? "selected" : "" %>>ConfirmÃ©e</option>
+                    <option value="cancelled" <%= "cancelled".equals(filterStatus) ? "selected" : "" %>>AnnulÃ©e</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100 me-2">Filtrer</button>
+                <a href="bookings" class="btn btn-secondary">RÃ©initialiser</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+            <tr>
+                <th>RÃ©fÃ©rence</th>
+                <th>Passager</th>
+                <th>Vol</th>
+                <th>Trajet</th>
+                <th>Date Vol</th>
+                <th>Heure DÃ©part</th>
+                <th>Avion</th>
+                <th>SiÃ¨ge</th>
+                <th>Montant (â‚¬)</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <% 
+            if (bookings != null && !bookings.isEmpty()) {
+                int visibleCount = 0;
+                double totalAmount = 0.0;
+                for (Booking booking : bookings) {
+                    // Application des filtres
+                    String passengerName = booking.getPassenger().getFirstName() + " " + booking.getPassenger().getLastName();
+                    String flightNumber = booking.getFlight().getFlightNumber();
+                    String status = booking.getStatus();
+                    
+                    boolean matchPassenger = filterPassenger.isEmpty() || 
+                        passengerName.toLowerCase().contains(filterPassenger.toLowerCase());
+                    boolean matchFlight = filterFlight.isEmpty() || 
+                        flightNumber.toLowerCase().contains(filterFlight.toLowerCase());
+                    boolean matchStatus = filterStatus.isEmpty() || status.equals(filterStatus);
+                    
+                    if (matchPassenger && matchFlight && matchStatus) {
+                        visibleCount++;
+                        totalAmount += booking.getTotalAmount();
+            %>
+            <tr>
+                <td><strong><%= booking.getBookingReference() %></strong></td>
+                <td>
+                    <%= booking.getPassenger().getFirstName() + " " + booking.getPassenger().getLastName() %>
+                </td>
+                <td><span class="badge bg-primary"><%= booking.getFlight().getFlightNumber() %></span></td>
+                <td>
+                    <%= booking.getFlight().getDepartureAirport().getCode() %> â†’
+                    <%= booking.getFlight().getArrivalAirport().getCode() %>
+                </td>
+                <td>
+                    <%= dateFormat.format(booking.getFlight().getDepartureTime()) %>
+                </td>
+                <td>
+                    <%= sdf.format(booking.getFlight().getDepartureTime()) %>
+                </td>
+                <td>
+                    <%= booking.getFlight().getAircraft() != null ? 
+                        booking.getFlight().getAircraft().getRegistration() : "N/A" %>
+                </td>
+                <td><span class="badge bg-info"><%= booking.getSeatNumber() %></span></td>
+                <td><%= String.format("%.2f", booking.getTotalAmount()) %> â‚¬</td>
+                <td>
+                    <% 
+                        String badgeClass = "confirmed".equals(status) ? "bg-success" : "bg-danger";
+                    %>
+                    <span class="badge <%= badgeClass %>"><%= status %></span>
+                </td>
+                <td>
+                    <% if ("confirmed".equals(booking.getStatus())) { %>
+                    <a href="bookings?action=cancel&id=<%= booking.getId() %>"
+                       class="btn btn-sm btn-danger"
+                       onclick="return confirm('ÃŠtes-vous sÃ»r de vouloir annuler cette rÃ©servation ?')">
+                        âŒ Annuler
+                    </a>
+                    <% } else { %>
+                    <span class="text-muted">AnnulÃ©e</span>
+                    <% } %>
+                </td>
+            </tr>
+            <% 
+                    }
+                }
+                if (visibleCount == 0) {
+            %>
+            <tr>
+                <td colspan="11" class="text-center">Aucune rÃ©servation ne correspond aux critÃ¨res de filtre</td>
+            </tr>
+            <%
+                } else {
+            %>
+            <tr class="table-info fw-bold">
+                <td colspan="8" class="text-end">TOTAL :</td>
+                <td><%= String.format("%.2f", totalAmount) %> â‚¬</td>
+                <td colspan="2"></td>
+            </tr>
+            <%
+                }
+            } else { 
+            %>
+            <tr>
+                <td colspan="11" class="text-center">Aucune rÃ©servation disponible</td>
+            </tr>
+            <% } %>
+            </tbody>
+        </table>
+    </div>
+
+    <% 
+    // Afficher un rÃ©sumÃ© sous le tableau si des rÃ©servations sont affichÃ©es
+    if (bookings != null && !bookings.isEmpty()) {
+        int visibleCount = 0;
+        double totalAmount = 0.0;
+        for (Booking booking : bookings) {
+            String passengerName = booking.getPassenger().getFirstName() + " " + booking.getPassenger().getLastName();
+            String flightNumber = booking.getFlight().getFlightNumber();
+            String status = booking.getStatus();
+            
+            boolean matchPassenger = filterPassenger.isEmpty() || 
+                passengerName.toLowerCase().contains(filterPassenger.toLowerCase());
+            boolean matchFlight = filterFlight.isEmpty() || 
+                flightNumber.toLowerCase().contains(filterFlight.toLowerCase());
+            boolean matchStatus = filterStatus.isEmpty() || status.equals(filterStatus);
+            
+            if (matchPassenger && matchFlight && matchStatus) {
+                visibleCount++;
+                totalAmount += booking.getTotalAmount();
+            }
+        }
+        if (visibleCount > 0) {
+    %>
+    <div class="alert alert-info mt-3">
+        <div class="row">
+            <div class="col-md-6">
+                <strong>ðŸ“Š RÃ©sumÃ© des rÃ©servations affichÃ©es:</strong>
+            </div>
+            <div class="col-md-6 text-end">
+                <strong><%= visibleCount %></strong> rÃ©servation(s) | 
+                <strong>Montant total: <%= String.format("%.2f", totalAmount) %> â‚¬</strong>
+            </div>
+        </div>
+    </div>
+    <% 
+        }
+    }
+    %>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+
+
+==============================
+FICHIER : D:\ITU\L3\S5\MmeBaovola\compagnie-aerienne\src\main\webapp\WEB-INF\jsp\bookings\newBooking.jsp
+==============================
+
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nouvelle RÃ©servation - GCA Airlines</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<%@ include file="../navbar.jsp" %>
+
+<div class="container mt-4">
+    <h2 class="mb-4">ðŸŽ« Nouvelle RÃ©servation</h2>
+
+    <% if (request.getAttribute("errorMessage") != null) { %>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <%= request.getAttribute("errorMessage") %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <% } %>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">ðŸ” Rechercher un passager existant</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="bookings">
+                        <input type="hidden" name="action" value="searchPassenger">
+                        <div class="mb-3">
+                            <label for="passportNumber" class="form-label">NumÃ©ro de Passeport *</label>
+                            <input type="text" class="form-control" id="passportNumber"
+                                   name="passportNumber" placeholder="Ex: ABC123456" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            ðŸ” Rechercher
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">âž• CrÃ©er un nouveau passager</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="bookings">
+                        <input type="hidden" name="action" value="createPassenger">
+
+                        <div class="mb-3">
+                            <label for="firstName" class="form-label">PrÃ©nom *</label>
+                            <input type="text" class="form-control" id="firstName"
+                                   name="firstName" placeholder="Jean" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="lastName" class="form-label">Nom *</label>
+                            <input type="text" class="form-control" id="lastName"
+                                   name="lastName" placeholder="Dupont" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email"
+                                   placeholder="jean.dupont@example.com">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">TÃ©lÃ©phone</label>
+                            <input type="tel" class="form-control" id="phone" name="phone"
+                                   placeholder="+261 XX XXX XXXX">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="passportNumberNew" class="form-label">NumÃ©ro de Passeport *</label>
+                            <input type="text" class="form-control" id="passportNumberNew"
+                                   name="passportNumber" placeholder="ABC123456" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="dateOfBirth" class="form-label">Date de Naissance *</label>
+                            <input type="date" class="form-control" id="dateOfBirth"
+                                   name="dateOfBirth" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100">
+                            âž• CrÃ©er et Continuer
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a href="bookings" class="btn btn-secondary">â†©ï¸ Retour</a>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+
+
+==============================
+FICHIER : D:\ITU\L3\S5\MmeBaovola\compagnie-aerienne\src\main\webapp\WEB-INF\jsp\bookings\selectFlight.jsp
+==============================
+
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="main.project.beans.*" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.text.SimpleDateFormat" %>
+
+<%
+    Passenger passenger = (Passenger) request.getAttribute("passenger");
+    List<FlightInstance> flightInstances = (List<FlightInstance>) request.getAttribute("flightInstances");
+    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+    
+    // RÃ©cupÃ©rer les paramÃ¨tres de filtrage
+    String filterDeparture = request.getParameter("filterDeparture") != null ? request.getParameter("filterDeparture").trim() : "";
+    String filterArrival = request.getParameter("filterArrival") != null ? request.getParameter("filterArrival").trim() : "";
+    String filterFlightDate = request.getParameter("filterFlightDate") != null ? request.getParameter("filterFlightDate").trim() : "";
+    String filterDepartureTime = request.getParameter("filterDepartureTime") != null ? request.getParameter("filterDepartureTime").trim() : "";
+    
+    // Filtrer les instances de vol
+    List<FlightInstance> filteredInstances = new ArrayList<>();
+    if (flightInstances != null) {
+        for (FlightInstance fi : flightInstances) {
+            boolean matches = true;
+            
+            // Filtre par aÃ©roport de dÃ©part
+            if (!filterDeparture.isEmpty()) {
+                String depCode = fi.getRoute().getDepartureAirport() != null ? 
+                    fi.getRoute().getDepartureAirport().getCode().toUpperCase() : "";
+                if (!depCode.contains(filterDeparture.toUpperCase())) {
+                    matches = false;
+                }
+            }
+            
+            // Filtre par aÃ©roport d'arrivÃ©e
+            if (!filterArrival.isEmpty() && matches) {
+                String arrCode = fi.getRoute().getArrivalAirport() != null ? 
+                    fi.getRoute().getArrivalAirport().getCode().toUpperCase() : "";
+                if (!arrCode.contains(filterArrival.toUpperCase())) {
+                    matches = false;
+                }
+            }
+            
+            // Filtre par date de vol
+            if (!filterFlightDate.isEmpty() && matches) {
+                String flightDateStr = dateFormat.format(fi.getFlightDate());
+                if (!flightDateStr.contains(filterFlightDate)) {
+                    matches = false;
+                }
+            }
+            
+            // Filtre par heure de dÃ©part
+            if (!filterDepartureTime.isEmpty() && matches) {
+                String depTimeStr = sdf.format(fi.getDepartureTime());
+                if (!depTimeStr.contains(filterDepartureTime)) {
+                    matches = false;
+                }
+            }
+            
+            if (matches) {
+                filteredInstances.add(fi);
+            }
+        }
+    }
+%>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SÃ©lection du Vol - GCA Airlines</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<%@ include file="../navbar.jsp" %>
+
+<div class="container mt-4">
+    <h2 class="mb-4">âœˆï¸ SÃ©lection du Vol</h2>
+
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0">ðŸ‘¤ Informations du Passager</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Nom:</strong> <%= passenger.getFirstName() + " " + passenger.getLastName() %></p>
+                    <p><strong>Email:</strong> <%= passenger.getEmail() != null ? passenger.getEmail() : "N/A" %></p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Passeport:</strong> <%= passenger.getPassportNumber() %></p>
+                    <p><strong>TÃ©lÃ©phone:</strong> <%= passenger.getPhone() != null ? passenger.getPhone() : "N/A" %></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panneau de filtrage -->
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">ðŸ” Filtrer les vols disponibles</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" action="bookings" class="row g-3">
+                <input type="hidden" name="action" value="selectFlight">
+                <input type="hidden" name="passengerId" value="<%= passenger.getId() %>">
+                
+                <div class="col-md-3">
+                    <label for="filterDeparture" class="form-label">AÃ©roport DÃ©part</label>
+                    <input type="text" class="form-control" id="filterDeparture" name="filterDeparture" 
+                           placeholder="ex: TNR" value="<%= filterDeparture %>" maxlength="10">
+                </div>
+                
+                <div class="col-md-3">
+                    <label for="filterArrival" class="form-label">AÃ©roport ArrivÃ©e</label>
+                    <input type="text" class="form-control" id="filterArrival" name="filterArrival" 
+                           placeholder="ex: CDG" value="<%= filterArrival %>" maxlength="10">
+                </div>
+                
+                <div class="col-md-3">
+                    <label for="filterFlightDate" class="form-label">Date du Vol</label>
+                    <input type="text" class="form-control" id="filterFlightDate" name="filterFlightDate" 
+                           placeholder="dd/MM/yyyy" value="<%= filterFlightDate %>">
+                </div>
+                
+                <div class="col-md-3">
+                    <label for="filterDepartureTime" class="form-label">Heure DÃ©part</label>
+                    <input type="text" class="form-control" id="filterDepartureTime" name="filterDepartureTime" 
+                           placeholder="HH:mm" value="<%= filterDepartureTime %>">
+                </div>
+                
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">ðŸ” Filtrer</button>
+                    <a href="bookings?action=selectFlight&passengerId=<%= passenger.getId() %>" class="btn btn-secondary">
+                        ðŸ”„ RÃ©initialiser
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- RÃ©sultats -->
+    <div class="alert alert-info">
+        <strong><%= filteredInstances.size() %></strong> vol(s) trouvÃ©(s) 
+        <% if (flightInstances != null) { %>
+            sur <strong><%= flightInstances.size() %></strong> au total
+        <% } %>
+    </div>
+
+    <h4 class="mb-3">ðŸ“… Instances de Vol Disponibles</h4>
+
+    <% if (filteredInstances != null && !filteredInstances.isEmpty()) {
+        for (FlightInstance fi : filteredInstances) { %>
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h5 class="card-title">
+                        <span class="badge bg-primary"><%= fi.getRoute().getFlightNumber() %></span>
+                    </h5>
+                    <p class="mb-1">
+                        <strong><%= fi.getRoute().getDepartureAirport().getCode() %></strong>
+                        (<%= fi.getRoute().getDepartureAirport().getCity() %>)
+                        â†’
+                        <strong><%= fi.getRoute().getArrivalAirport().getCode() %></strong>
+                        (<%= fi.getRoute().getArrivalAirport().getCity() %>)
+                    </p>
+                    <p class="mb-1">
+                        ðŸ“… Vol du: <strong><%= dateFormat.format(fi.getFlightDate()) %></strong>
+                    </p>
+                    <p class="mb-1">
+                        ðŸ›« DÃ©part: <%= sdf.format(fi.getDepartureTime()) %> |
+                        ðŸ›¬ ArrivÃ©e: <%= sdf.format(fi.getArrivalTime()) %>
+                    </p>
+                    <p class="mb-0">
+                        âœˆï¸ <%= fi.getAircraft() != null ? fi.getAircraft().getModel() : "N/A" %>
+                        (<%= fi.getAircraft() != null ? fi.getAircraft().getRegistration() : "N/A" %>) -
+                        <%= fi.getAircraft() != null ? fi.getAircraft().getTotalSeats() : "?" %> siÃ¨ges
+                    </p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <h4 class="text-primary"><%= String.format("%.2f", fi.getBasePrice()) %> â‚¬</h4>
+                    <button class="btn btn-success" data-bs-toggle="modal"
+                            data-bs-target="#seatModal<%= fi.getId() %>">
+                        âœ… RÃ©server
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pour sÃ©lection du siÃ¨ge -->
+    <div class="modal fade" id="seatModal<%= fi.getId() %>" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">SÃ©lection du SiÃ¨ge - <%= fi.getRoute().getFlightNumber() %></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form method="post" action="bookings">
+                    <div class="modal-body">
+                        <input type="hidden" name="action" value="createBooking">
+                        <input type="hidden" name="passengerId" value="<%= passenger.getId() %>">
+                        <input type="hidden" name="flightInstanceId" value="<%= fi.getId() %>">
+
+                        <div class="mb-3">
+                            <label class="form-label">Choisissez votre siÃ¨ge:</label>
+
+                            <div class="mb-2">
+                                <button type="submit" name="seatNumber" value="random"
+                                        class="btn btn-primary w-100">
+                                    ðŸŽ² SiÃ¨ge AlÃ©atoire (RecommandÃ©)
+                                </button>
+                            </div>
+
+                            <div class="text-center my-2">
+                                <small class="text-muted">ou</small>
+                            </div>
+
+                            <div>
+                                <label for="seatManual<%= fi.getId() %>" class="form-label">
+                                    SÃ©lection manuelle (ex: 15C):
+                                </label>
+                                <input type="text" class="form-control"
+                                       id="seatManual<%= fi.getId() %>"
+                                       name="seatNumber"
+                                       placeholder="Ex: 15C"
+                                       maxlength="5">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            Annuler
+                        </button>
+                        <button type="submit" class="btn btn-success">
+                            Confirmer la RÃ©servation
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <% }
+    } else { %>
+    <div class="alert alert-warning">
+        <% if (flightInstances != null && !flightInstances.isEmpty()) { %>
+            âš ï¸ Aucun vol ne correspond Ã  votre recherche
+        <% } else { %>
+            â„¹ï¸ Aucun vol disponible pour le moment
+        <% } %>
+    </div>
+    <% } %>
+
+    <div class="mt-4">
+        <a href="bookings" class="btn btn-secondary">â†©ï¸ Retour aux rÃ©servations</a>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+
+
+==============================
+FICHIER : D:\ITU\L3\S5\MmeBaovola\compagnie-aerienne\src\main\webapp\WEB-INF\jsp\flights\addFlight.jsp
+==============================
+
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="main.project.beans.*" %>
+<%@ page import="java.util.List" %>
+<%
+    List<Airport> airports = (List<Airport>) request.getAttribute("airports");
+    List<Aircraft> aircrafts = (List<Aircraft>) request.getAttribute("aircrafts");
+%>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajouter un Vol - GCA Airlines</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<%@ include file="../navbar.jsp" %>
+
+<div class="container mt-4">
+    <h2 class="mb-4">âž• Ajouter un Vol</h2>
+
+    <div class="card">
+        <div class="card-body">
+            <form method="post" action="flights">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="flightNumber" class="form-label">NumÃ©ro de Vol *</label>
+                        <input type="text" class="form-control" id="flightNumber" name="flightNumber" required>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="status" class="form-label">Statut *</label>
+                        <select class="form-select" id="status" name="status" required>
+                            <option value="scheduled">Scheduled</option>
+                            <option value="departed">Departed</option>
+                            <option value="arrived">Arrived</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="departureAirportId" class="form-label">AÃ©roport de DÃ©part *</label>
+                        <select class="form-select" id="departureAirportId" name="departureAirportId" required>
+                            <option value="">SÃ©lectionner...</option>
+                            <% if (airports != null) {
+                                for (Airport airport : airports) { %>
+                            <option value="<%= airport.getId() %>"><%= airport.toString() %></option>
+                            <% }
+                            } %>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="arrivalAirportId" class="form-label">AÃ©roport d'ArrivÃ©e *</label>
+                        <select class="form-select" id="arrivalAirportId" name="arrivalAirportId" required>
+                            <option value="">SÃ©lectionner...</option>
+                            <% if (airports != null) {
+                                for (Airport airport : airports) { %>
+                            <option value="<%= airport.getId() %>"><%= airport.toString() %></option>
+                            <% }
+                            } %>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="departureTime" class="form-label">Date/Heure de DÃ©part *</label>
+                        <input type="datetime-local" class="form-control" id="departureTime" name="departureTime" required>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="arrivalTime" class="form-label">Date/Heure d'ArrivÃ©e *</label>
+                        <input type="datetime-local" class="form-control" id="arrivalTime" name="arrivalTime" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="aircraftId" class="form-label">Avion *</label>
+                        <select class="form-select" id="aircraftId" name="aircraftId" required>
+                            <option value="">SÃ©lectionner...</option>
+                            <% if (aircrafts != null) {
+                                for (Aircraft aircraft : aircrafts) { %>
+                            <option value="<%= aircraft.getId() %>"><%= aircraft.toString() %></option>
+                            <% }
+                            } %>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="basePrice" class="form-label">Prix de Base (â‚¬) *</label>
+                        <input type="number" step="0.01" class="form-control" id="basePrice" name="basePrice" required>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">ðŸ’¾ Enregistrer</button>
+                    <a href="flights" class="btn btn-secondary">â†©ï¸ Annuler</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+
+
+==============================
+FICHIER : D:\ITU\L3\S5\MmeBaovola\compagnie-aerienne\src\main\webapp\WEB-INF\jsp\flights\addFlightInstance.jsp
+==============================
+
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="main.project.beans.*" %>
+<%@ page import="java.util.List" %>
+
+<%
+    List<FlightRoute> routes = (List<FlightRoute>) request.getAttribute("flightRoutes");
+    List<Aircraft> aircrafts = (List<Aircraft>) request.getAttribute("aircrafts");
+%>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Programmer un Vol - GCA Airlines</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<%@ include file="../navbar.jsp" %>
+
+<div class="container mt-4">
+    <h2 class="mb-4">âž• Programmer une Instance de Vol</h2>
+
+    <div class="card">
+        <div class="card-body">
+            <form method="post" action="flight-instances">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="routeId" class="form-label">Route de Vol *</label>
+                        <select class="form-select" id="routeId" name="routeId" required>
+                            <option value="">SÃ©lectionner une route...</option>
+                            <% if (routes != null) {
+                                for (FlightRoute route : routes) { %>
+                            <option value="<%= route.getId() %>">
+                                <%= route.getFlightNumber() %> 
+                                (<%= route.getDepartureAirport() != null ? route.getDepartureAirport().getCode() : "?" %> 
+                                â†’ <%= route.getArrivalAirport() != null ? route.getArrivalAirport().getCode() : "?" %>)
+                            </option>
+                            <% }
+                            } %>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="flightDate" class="form-label">Date du Vol *</label>
+                        <input type="date" class="form-control" id="flightDate" name="flightDate" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="departureTime" class="form-label">Heure de DÃ©part *</label>
+                        <input type="datetime-local" class="form-control" id="departureTime" name="departureTime" required>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="arrivalTime" class="form-label">Heure d'ArrivÃ©e *</label>
+                        <input type="datetime-local" class="form-control" id="arrivalTime" name="arrivalTime" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="aircraftId" class="form-label">Avion *</label>
+                        <select class="form-select" id="aircraftId" name="aircraftId" required>
+                            <option value="">SÃ©lectionner un avion...</option>
+                            <% if (aircrafts != null) {
+                                for (Aircraft aircraft : aircrafts) { %>
+                            <option value="<%= aircraft.getId() %>">
+                                <%= aircraft.getRegistration() %> - <%= aircraft.getModel() %> 
+                                (<%= aircraft.getTotalSeats() %> places)
+                            </option>
+                            <% }
+                            } %>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="basePrice" class="form-label">Prix de Base (â‚¬) *</label>
+                        <input type="number" step="0.01" class="form-control" id="basePrice" name="basePrice" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label for="status" class="form-label">Statut *</label>
+                        <select class="form-select" id="status" name="status" required>
+                            <option value="scheduled">Scheduled</option>
+                            <option value="boarding">Boarding</option>
+                            <option value="departed">Departed</option>
+                            <option value="arrived">Arrived</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">ðŸ’¾ Enregistrer</button>
+                    <a href="flight-instances" class="btn btn-secondary">â†©ï¸ Annuler</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+
+
+==============================
+FICHIER : D:\ITU\L3\S5\MmeBaovola\compagnie-aerienne\src\main\webapp\WEB-INF\jsp\flights\addFlightRoute.jsp
+==============================
+
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="main.project.beans.*" %>
+<%@ page import="java.util.List" %>
+
+<%
+    List<Airport> airports = (List<Airport>) request.getAttribute("airports");
+%>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajouter une Route - GCA Airlines</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<%@ include file="../navbar.jsp" %>
+
+<div class="container mt-4">
+    <h2 class="mb-4">âž• Ajouter une Route de Vol</h2>
+
+    <div class="card">
+        <div class="card-body">
+            <form method="post" action="flight-routes">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="flightNumber" class="form-label">NumÃ©ro de Vol *</label>
+                        <input type="text" class="form-control" id="flightNumber" name="flightNumber" 
+                               placeholder="ex: AF101" required>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="status" class="form-label">Statut *</label>
+                        <select class="form-select" id="status" name="status" required>
+                            <option value="active">Active</option>
+                            <option value="suspended">Suspended</option>
+                            <option value="discontinued">Discontinued</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="departureAirportId" class="form-label">AÃ©roport de DÃ©part *</label>
+                        <select class="form-select" id="departureAirportId" name="departureAirportId" required>
+                            <option value="">SÃ©lectionner...</option>
+                            <% if (airports != null) {
+                                for (Airport airport : airports) { %>
+                            <option value="<%= airport.getId() %>">
+                                <%= airport.getCode() %> - <%= airport.getName() %> (<%= airport.getCity() %>)
+                            </option>
+                            <% }
+                            } %>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="arrivalAirportId" class="form-label">AÃ©roport d'ArrivÃ©e *</label>
+                        <select class="form-select" id="arrivalAirportId" name="arrivalAirportId" required>
+                            <option value="">SÃ©lectionner...</option>
+                            <% if (airports != null) {
+                                for (Airport airport : airports) { %>
+                            <option value="<%= airport.getId() %>">
+                                <%= airport.getCode() %> - <%= airport.getName() %> (<%= airport.getCity() %>)
+                            </option>
+                            <% }
+                            } %>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="distance" class="form-label">Distance (km)</label>
+                        <input type="number" class="form-control" id="distance" name="distance" 
+                               placeholder="ex: 5500">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="estimatedDuration" class="form-label">DurÃ©e EstimÃ©e (heures:minutes)</label>
+                        <input type="text" class="form-control" id="estimatedDuration" name="estimatedDuration" 
+                               placeholder="ex: 10:30">
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">ðŸ’¾ Enregistrer</button>
+                    <a href="flight-routes" class="btn btn-secondary">â†©ï¸ Annuler</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+
+
+==============================
+FICHIER : D:\ITU\L3\S5\MmeBaovola\compagnie-aerienne\src\main\webapp\WEB-INF\jsp\flights\editFlight.jsp
+==============================
+
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="main.project.beans.*" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.text.SimpleDateFormat" %>
+<%
+    Flight flight = (Flight) request.getAttribute("flight");
+    List<Airport> airports = (List<Airport>) request.getAttribute("airports");
+    List<Aircraft> aircrafts = (List<Aircraft>) request.getAttribute("aircrafts");
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
+%>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modifier un Vol - GCA Airlines</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<%@ include file="../navbar.jsp" %>
+
+<div class="container mt-4">
+    <h2 class="mb-4">âœï¸ Modifier un Vol</h2>
+
+    <div class="card">
+        <div class="card-body">
+            <form method="post" action="flights">
+                <input type="hidden" name="action" value="update">
+                <input type="hidden" name="id" value="<%= flight.getId() %>">
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="flightNumber" class="form-label">NumÃ©ro de Vol *</label>
+                        <input type="text" class="form-control" id="flightNumber" name="flightNumber"
+                               value="<%= flight.getFlightNumber() %>" required>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="status" class="form-label">Statut *</label>
+                        <select class="form-select" id="status" name="status" required>
+                            <option value="scheduled" <%= "scheduled".equals(flight.getStatus()) ? "selected" : "" %>>Scheduled</option>
+                            <option value="departed" <%= "departed".equals(flight.getStatus()) ? "selected" : "" %>>Departed</option>
+                            <option value="arrived" <%= "arrived".equals(flight.getStatus()) ? "selected" : "" %>>Arrived</option>
+                            <option value="cancelled" <%= "cancelled".equals(flight.getStatus()) ? "selected" : "" %>>Cancelled</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="departureAirportId" class="form-label">AÃ©roport de DÃ©part *</label>
+                        <select class="form-select" id="departureAirportId" name="departureAirportId" required>
+                            <% if (airports != null) {
+                                for (Airport airport : airports) { %>
+                            <option value="<%= airport.getId() %>"
+                                    <%= airport.getId() == flight.getDepartureAirportId() ? "selected" : "" %>>
+                                <%= airport.toString() %>
+                            </option>
+                            <% }
+                            } %>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="arrivalAirportId" class="form-label">AÃ©roport d'ArrivÃ©e *</label>
+                        <select class="form-select" id="arrivalAirportId" name="arrivalAirportId" required>
+                            <% if (airports != null) {
+                                for (Airport airport : airports) { %>
+                            <option value="<%= airport.getId() %>"
+                                    <%= airport.getId() == flight.getArrivalAirportId() ? "selected" : "" %>>
+                                <%= airport.toString() %>
+                            </option>
+                            <% }
+                            } %>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="departureTime" class="form-label">Date/Heure de DÃ©part *</label>
+                        <input type="datetime-local" class="form-control" id="departureTime" name="departureTime"
+                               value="<%= sdf.format(flight.getDepartureTime()) %>" required>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="arrivalTime" class="form-label">Date/Heure d'ArrivÃ©e *</label>
+                        <input type="datetime-local" class="form-control" id="arrivalTime" name="arrivalTime"
+                               value="<%= sdf.format(flight.getArrivalTime()) %>" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="aircraftId" class="form-label">Avion *</label>
+                        <select class="form-select" id="aircraftId" name="aircraftId" required>
+                            <% if (aircrafts != null) {
+                                for (Aircraft aircraft : aircrafts) { %>
+                            <option value="<%= aircraft.getId() %>"
+                                    <%= aircraft.getId() == flight.getAircraftId() ? "selected" : "" %>>
+                                <%= aircraft.toString() %>
+                            </option>
+                            <% }
+                            } %>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="basePrice" class="form-label">Prix de Base (â‚¬) *</label>
+                        <input type="number" step="0.01" class="form-control" id="basePrice" name="basePrice"
+                               value="<%= flight.getBasePrice() %>" required>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">ðŸ’¾ Enregistrer</button>
+                    <a href="flights" class="btn btn-secondary">â†©ï¸ Annuler</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+
+
+==============================
+FICHIER : D:\ITU\L3\S5\MmeBaovola\compagnie-aerienne\src\main\webapp\WEB-INF\jsp\flights\flight-bookings.jsp
+==============================
+
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="main.project.beans.*" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.text.SimpleDateFormat" %>
+
+<%
+    FlightInstance fi = (FlightInstance) request.getAttribute("flightInstance");
+    List<Booking> bookings = (List<Booking>) request.getAttribute("bookings");
+    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+%>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>RÃ©servations du Vol - <%= fi.getRoute().getFlightNumber() %></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<%@ include file="../navbar.jsp" %>
+
+<div class="container mt-4">
+    <h2>ðŸŽ« RÃ©servations pour le vol <%= fi.getRoute().getFlightNumber() %></h2>
+    <p><strong>DÃ©part:</strong> <%= fi.getRoute().getDepartureAirport().getCode() %> - <%= fi.getRoute().getDepartureAirport().getCity() %>
+       | <strong>ArrivÃ©e:</strong> <%= fi.getRoute().getArrivalAirport().getCode() %> - <%= fi.getRoute().getArrivalAirport().getCity() %></p>
+    <p><strong>Date du vol:</strong> <%= dateFormat.format(fi.getFlightDate()) %>
+       | <strong>Heure dÃ©part:</strong> <%= sdf.format(fi.getDepartureTime()) %></p>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+            <tr>
+                <th>RÃ©fÃ©rence</th>
+                <th>Passager</th>
+                <th>SiÃ¨ge</th>
+                <th>Montant (â‚¬)</th>
+                <th>Statut</th>
+            </tr>
+            </thead>
+            <tbody>
+            <% if (bookings != null && !bookings.isEmpty()) {
+                for (Booking booking : bookings) { %>
+            <tr>
+                <td><%= booking.getBookingReference() %></td>
+                <td><%= booking.getPassenger().getFirstName() + " " + booking.getPassenger().getLastName() %></td>
+                <td><%= booking.getSeatNumber() %></td>
+                <td><%= String.format("%.2f", booking.getTotalAmount()) %></td>
+                <td>
+                    <span class="badge <%= "confirmed".equals(booking.getStatus()) ? "bg-success" : "bg-danger" %>">
+                        <%= booking.getStatus() %>
+                    </span>
+                </td>
+            </tr>
+            <% } } else { %>
+            <tr>
+                <td colspan="5" class="text-center">Aucune rÃ©servation pour ce vol</td>
+            </tr>
+            <% } %>
+            </tbody>
+        </table>
+    </div>
+
+    <a href="flight-instances" class="btn btn-secondary mt-3">â†©ï¸ Retour aux vols</a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+
+
+==============================
+FICHIER : D:\ITU\L3\S5\MmeBaovola\compagnie-aerienne\src\main\webapp\WEB-INF\jsp\flights\listFlightInstances.jsp
+==============================
+
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="main.project.beans.*" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="java.sql.Date" %>
+
+<%
+    Employee employee = (Employee) session.getAttribute("employee");
+    if (employee == null) {
+        response.sendRedirect("login");
+        return;
+    }
+    
+    List<FlightInstance> instances = (List<FlightInstance>) request.getAttribute("flightInstances");
+    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+    
+    // ParamÃ¨tres de filtrage
+    String filterDeparture = request.getParameter("filterDeparture") != null ? request.getParameter("filterDeparture").trim() : "";
+    String filterArrival = request.getParameter("filterArrival") != null ? request.getParameter("filterArrival").trim() : "";
+    String filterFlightDate = request.getParameter("filterFlightDate") != null ? request.getParameter("filterFlightDate").trim() : "";
+    String filterDepartureTime = request.getParameter("filterDepartureTime") != null ? request.getParameter("filterDepartureTime").trim() : "";
+    String filterMinPrice = request.getParameter("filterMinPrice") != null ? request.getParameter("filterMinPrice").trim() : "";
+    String filterMaxPrice = request.getParameter("filterMaxPrice") != null ? request.getParameter("filterMaxPrice").trim() : "";
+    
+    // Filtrer les instances
+    List<FlightInstance> filteredInstances = new ArrayList<>();
+    if (instances != null) {
+        for (FlightInstance fi : instances) {
+            boolean matches = true;
+            if (!filterDeparture.isEmpty()) {
+                String depCode = fi.getRoute().getDepartureAirport() != null ? 
+                    fi.getRoute().getDepartureAirport().getCode().toUpperCase() : "";
+                if (!depCode.contains(filterDeparture.toUpperCase())) matches = false;
+            }
+            if (!filterArrival.isEmpty() && matches) {
+                String arrCode = fi.getRoute().getArrivalAirport() != null ? 
+                    fi.getRoute().getArrivalAirport().getCode().toUpperCase() : "";
+                if (!arrCode.contains(filterArrival.toUpperCase())) matches = false;
+            }
+            if (!filterFlightDate.isEmpty() && matches) {
+                String flightDateStr = dateFormat.format(fi.getFlightDate());
+                if (!flightDateStr.contains(filterFlightDate)) matches = false;
+            }
+            if (!filterDepartureTime.isEmpty() && matches) {
+                String depTimeStr = sdf.format(fi.getDepartureTime());
+                if (!depTimeStr.contains(filterDepartureTime)) matches = false;
+            }
+            if (!filterMinPrice.isEmpty() && matches) {
+                try {
+                    double minPrice = Double.parseDouble(filterMinPrice);
+                    if (fi.getBasePrice() < minPrice) matches = false;
+                } catch (NumberFormatException e) {}
+            }
+            if (!filterMaxPrice.isEmpty() && matches) {
+                try {
+                    double maxPrice = Double.parseDouble(filterMaxPrice);
+                    if (fi.getBasePrice() > maxPrice) matches = false;
+                } catch (NumberFormatException e) {}
+            }
+            if (matches) filteredInstances.add(fi);
+        }
+    }
+%>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Vols - GCA Airlines</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<%@ include file="../navbar.jsp" %>
+
+<div class="container mt-4">
+    <%
+        String successMessage = (String) session.getAttribute("successMessage");
+        String errorMessage = (String) session.getAttribute("errorMessage");
+        if (successMessage != null) { session.removeAttribute("successMessage"); %>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <%= successMessage %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <% }
+        if (errorMessage != null) { session.removeAttribute("errorMessage"); %>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <%= errorMessage %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <% } %>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>ðŸ“‹ Gestion des Instances de Vol</h2>
+        <a href="flight-instances?action=add" class="btn btn-primary">âž• Programmer un vol</a>
+    </div>
+
+    <!-- Filtrage -->
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">ðŸ” Filtrer les vols</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" action="flight-instances" class="row g-3">
+                <div class="col-md-2">
+                    <label class="form-label">DÃ©part</label>
+                    <input type="text" class="form-control" name="filterDeparture" placeholder="ex: TNR" value="<%= filterDeparture %>">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">ArrivÃ©e</label>
+                    <input type="text" class="form-control" name="filterArrival" placeholder="ex: CDG" value="<%= filterArrival %>">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Date du Vol</label>
+                    <input type="text" class="form-control" name="filterFlightDate" placeholder="dd/MM/yyyy" value="<%= filterFlightDate %>">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Heure DÃ©part</label>
+                    <input type="text" class="form-control" name="filterDepartureTime" placeholder="HH:mm" value="<%= filterDepartureTime %>">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Prix Min (â‚¬)</label>
+                    <input type="number" step="0.01" class="form-control" name="filterMinPrice" value="<%= filterMinPrice %>">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Prix Max (â‚¬)</label>
+                    <input type="number" step="0.01" class="form-control" name="filterMaxPrice" value="<%= filterMaxPrice %>">
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">ðŸ” Filtrer</button>
+                    <a href="flight-instances" class="btn btn-secondary">ðŸ”„ RÃ©initialiser</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tableau des vols -->
+    <div class="alert alert-info">
+        <strong><%= filteredInstances.size() %></strong> vol(s) trouvÃ©(s)
+        <% if (instances != null) { %>
+            sur <strong><%= instances.size() %></strong> au total
+        <% } %>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>NumÃ©ro Vol</th>
+                    <th>DÃ©part</th>
+                    <th>ArrivÃ©e</th>
+                    <th>Date du Vol</th>
+                    <th>Heure DÃ©part</th>
+                    <th>Heure ArrivÃ©e</th>
+                    <th>Avion</th>
+                    <th>Prix (â‚¬)</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (filteredInstances != null && !filteredInstances.isEmpty()) {
+                    for (FlightInstance fi : filteredInstances) { %>
+                <tr style="cursor:pointer" onclick="window.location='flight-bookings?id=<%= fi.getId() %>'">
+                    <td><strong><%= fi.getRoute().getFlightNumber() %></strong></td>
+                    <td><%= fi.getRoute().getDepartureAirport() != null ? fi.getRoute().getDepartureAirport().getCode() + " - " + fi.getRoute().getDepartureAirport().getCity() : "N/A" %></td>
+                    <td><%= fi.getRoute().getArrivalAirport() != null ? fi.getRoute().getArrivalAirport().getCode() + " - " + fi.getRoute().getArrivalAirport().getCity() : "N/A" %></td>
+                    <td><%= dateFormat.format(fi.getFlightDate()) %></td>
+                    <td><%= sdf.format(fi.getDepartureTime()) %></td>
+                    <td><%= sdf.format(fi.getArrivalTime()) %></td>
+                    <td><%= fi.getAircraft() != null ? fi.getAircraft().getRegistration() : "N/A" %></td>
+                    <td><%= String.format("%.2f", fi.getBasePrice()) %> â‚¬</td>
+                    <td>
+                        <% String status = fi.getStatus();
+                            String badgeClass = "bg-secondary";
+                            if ("scheduled".equals(status)) badgeClass = "bg-primary";
+                            else if ("boarding".equals(status)) badgeClass = "bg-info";
+                            else if ("departed".equals(status)) badgeClass = "bg-warning";
+                            else if ("arrived".equals(status)) badgeClass = "bg-success";
+                            else if ("cancelled".equals(status)) badgeClass = "bg-danger";
+                        %>
+                        <span class="badge <%= badgeClass %>"><%= status %></span>
+                    </td>
+                    <td>
+                        <a href="flight-instances?action=edit&id=<%= fi.getId() %>" class="btn btn-sm btn-warning">âœï¸</a>
+                        <a href="flight-instances?action=delete&id=<%= fi.getId() %>"
+                           class="btn btn-sm btn-danger"
+                           onclick="return confirm('ÃŠtes-vous sÃ»r de vouloir supprimer cette instance ?')">ðŸ—‘ï¸</a>
+                    </td>
+                </tr>
+                <% } } else { %>
+                <tr>
+                    <td colspan="10" class="text-center">
+                        <% if (instances != null && !instances.isEmpty()) { %>
+                            Aucun vol ne correspond Ã  votre recherche
+                        <% } else { %>
+                            Aucun vol programmÃ©
+                        <% } %>
+                    </td>
+                </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+
+
+==============================
+FICHIER : D:\ITU\L3\S5\MmeBaovola\compagnie-aerienne\src\main\webapp\WEB-INF\jsp\flights\listFlightRoutes.jsp
+==============================
+
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="main.project.beans.*" %>
+<%@ page import="java.util.List" %>
+
+<%
+    Employee employee = (Employee) session.getAttribute("employee");
+    if (employee == null) {
+        response.sendRedirect("login");
+        return;
+    }
+    List<FlightRoute> routes = (List<FlightRoute>) request.getAttribute("flightRoutes");
+%>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Routes - GCA Airlines</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<%@ include file="../navbar.jsp" %>
+
+<div class="container mt-4">
+    <%
+        String successMessage = (String) session.getAttribute("successMessage");
+        String errorMessage = (String) session.getAttribute("errorMessage");
+        if (successMessage != null) {
+            session.removeAttribute("successMessage");
+    %>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <%= successMessage %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <% }
+        if (errorMessage != null) {
+            session.removeAttribute("errorMessage");
+    %>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <%= errorMessage %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <% } %>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>âœˆï¸ Gestion des Routes de Vol</h2>
+        <a href="flight-routes?action=add" class="btn btn-primary">âž• Ajouter une route</a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+            <tr>
+                <th>NumÃ©ro Vol</th>
+                <th>DÃ©part</th>
+                <th>ArrivÃ©e</th>
+                <th>Distance (km)</th>
+                <th>DurÃ©e estimÃ©e</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <% if (routes != null && !routes.isEmpty()) {
+                for (FlightRoute route : routes) { %>
+            <tr>
+                <td><strong><%= route.getFlightNumber() %></strong></td>
+                <td>
+                    <%= route.getDepartureAirport() != null ? 
+                        route.getDepartureAirport().getCode() + " - " + route.getDepartureAirport().getCity() 
+                        : "N/A" %>
+                </td>
+                <td>
+                    <%= route.getArrivalAirport() != null ? 
+                        route.getArrivalAirport().getCode() + " - " + route.getArrivalAirport().getCity() 
+                        : "N/A" %>
+                </td>
+                <td><%= route.getDistance() != 0 ? route.getDistance() : "N/A" %></td>
+                <td><%= route.getEstimatedDuration() != null ? route.getEstimatedDuration() : "N/A" %></td>
+                <td>
+                    <% String status = route.getStatus();
+                        String badgeClass = "bg-secondary";
+                        if ("active".equals(status)) badgeClass = "bg-success";
+                        else if ("suspended".equals(status)) badgeClass = "bg-warning";
+                        else if ("discontinued".equals(status)) badgeClass = "bg-danger";
+                    %>
+                    <span class="badge <%= badgeClass %>"><%= status %></span>
+                </td>
+                <td>
+                    <a href="flight-routes?action=edit&id=<%= route.getId() %>" class="btn btn-sm btn-warning">âœï¸</a>
+                    <a href="flight-routes?action=delete&id=<%= route.getId() %>"
+                       class="btn btn-sm btn-danger"
+                       onclick="return confirm('ÃŠtes-vous sÃ»r de vouloir supprimer cette route ?')">ðŸ—‘ï¸</a>
+                </td>
+            </tr>
+            <% }
+            } else { %>
+            <tr>
+                <td colspan="7" class="text-center">Aucune route disponible</td>
+            </tr>
+            <% } %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+
+
+==============================
+FICHIER : D:\ITU\L3\S5\MmeBaovola\compagnie-aerienne\src\main\webapp\WEB-INF\jsp\flights\listFlights.jsp
+==============================
+
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="main.project.beans.*" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.text.SimpleDateFormat" %>
+<%
+    Employee employee = (Employee) session.getAttribute("employee");
+    if (employee == null) {
+        response.sendRedirect("login");
+        return;
+    }
+    List<Flight> flights = (List<Flight>) request.getAttribute("flights");
+    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+%>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Vols - GCA Airlines</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<%@ include file="../navbar.jsp" %>
+
+<div class="container mt-4">
+    <%
+        String successMessage = (String) session.getAttribute("successMessage");
+        String errorMessage = (String) session.getAttribute("errorMessage");
+        if (successMessage != null) {
+            session.removeAttribute("successMessage");
+    %>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <%= successMessage %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <% }
+        if (errorMessage != null) {
+            session.removeAttribute("errorMessage");
+    %>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <%= errorMessage %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <% } %>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>ðŸ“‹ Gestion des Vols</h2>
+        <a href="flights?action=add" class="btn btn-primary">âž• Ajouter un vol</a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+            <tr>
+                <th>NumÃ©ro Vol</th>
+                <th>DÃ©part</th>
+                <th>ArrivÃ©e</th>
+                <th>Date/Heure DÃ©part</th>
+                <th>Date/Heure ArrivÃ©e</th>
+                <th>Avion</th>
+                <th>Prix (â‚¬)</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <% if (flights != null && !flights.isEmpty()) {
+                for (Flight flight : flights) { %>
+            <tr>
+                <td><strong><%= flight.getFlightNumber() %></strong></td>
+                <td><%= flight.getDepartureAirport().getCode() %> - <%= flight.getDepartureAirport().getCity() %></td>
+                <td><%= flight.getArrivalAirport().getCode() %> - <%= flight.getArrivalAirport().getCity() %></td>
+                <td><%= sdf.format(flight.getDepartureTime()) %></td>
+                <td><%= sdf.format(flight.getArrivalTime()) %></td>
+                <td><%= flight.getAircraft() != null ? flight.getAircraft().getRegistration() : "N/A" %></td>
+                <td><%= String.format("%.2f", flight.getBasePrice()) %> â‚¬</td>
+                <td>
+                    <% String status = flight.getStatus();
+                        String badgeClass = "bg-secondary";
+                        if ("scheduled".equals(status)) badgeClass = "bg-primary";
+                        else if ("departed".equals(status)) badgeClass = "bg-warning";
+                        else if ("arrived".equals(status)) badgeClass = "bg-success";
+                        else if ("cancelled".equals(status)) badgeClass = "bg-danger";
+                    %>
+                    <span class="badge <%= badgeClass %>"><%= status %></span>
+                </td>
+                <td>
+                    <a href="flights?action=edit&id=<%= flight.getId() %>" class="btn btn-sm btn-warning">âœï¸</a>
+                    <a href="flights?action=delete&id=<%= flight.getId() %>"
+                       class="btn btn-sm btn-danger"
+                       onclick="return confirm('ÃŠtes-vous sÃ»r de vouloir supprimer ce vol ?')">ðŸ—‘ï¸</a>
+                </td>
+            </tr>
+            <% }
+            } else { %>
+            <tr>
+                <td colspan="9" class="text-center">Aucun vol disponible</td>
+            </tr>
+            <% } %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+
+
+==============================
+FICHIER : D:\ITU\L3\S5\MmeBaovola\compagnie-aerienne\src\main\webapp\WEB-INF\jsp\payments\dashboard.jsp
+==============================
+
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="main.project.beans.Employee" %>
+<%
+    Employee employee = (Employee) session.getAttribute("employee");
+    if (employee == null || (!employee.isAccountant() && !employee.isAdmin())) {
+        response.sendRedirect("dashboard");
+        return;
+    }
+
+    double totalRevenue = (Double) request.getAttribute("totalRevenue");
+    double monthRevenue = (Double) request.getAttribute("monthRevenue");
+    int monthCount = (Integer) request.getAttribute("monthCount");
+    int totalCount = (Integer) request.getAttribute("totalCount");
+%>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finances - GCA Airlines</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<%@ include file="../navbar.jsp" %>
+
+<div class="container mt-4">
+    <h2 class="mb-4">ðŸ’° Tableau de Bord Financier</h2>
+
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h6 class="card-title">Revenus Totaux</h6>
+                    <h3 class="mb-0"><%= String.format("%.2f", totalRevenue) %> â‚¬</h3>
+                    <small><%= totalCount %> paiements</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h6 class="card-title">Revenus ce Mois</h6>
+                    <h3 class="mb-0"><%= String.format("%.2f", monthRevenue) %> â‚¬</h3>
+                    <small><%= monthCount %> paiements</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <h6 class="card-title">Moyenne par Paiement</h6>
+                    <h3 class="mb-0">
+                        <%= totalCount > 0 ? String.format("%.2f", totalRevenue / totalCount) : "0.00" %> â‚¬
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <h6 class="card-title">Paiements Total</h6>
+                    <h3 class="mb-0"><%= totalCount %></h3>
+                    <small>transactions</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">ðŸ“‹ Liste des Paiements</h5>
+                    <p class="card-text">Consulter tous les paiements enregistrÃ©s</p>
+                    <a href="payments?action=list" class="btn btn-primary">Voir les paiements</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">âœˆï¸ Revenus par Vol</h5>
+                    <p class="card-text">Analyser les revenus de chaque vol</p>
+                    <a href="payments?action=byFlight" class="btn btn-success">Voir le rapport</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">ðŸ“… Revenus par Mois</h5>
+                    <p class="card-text">Analyser les revenus mensuels</p>
+                    <a href="payments?action=byMonth" class="btn btn-info">Voir le rapport</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+
+
+==============================
+FICHIER : D:\ITU\L3\S5\MmeBaovola\compagnie-aerienne\src\main\webapp\WEB-INF\jsp\payments\listPayments.jsp
+==============================
+
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="main.project.beans.*" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.text.SimpleDateFormat" %>
+<%
+    List<Payment> payments = (List<Payment>) request.getAttribute("payments");
+    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+%>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des Paiements - GCA Airlines</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<%@ include file="../navbar.jsp" %>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>ðŸ’³ Liste des Paiements</h2>
+        <a href="payments" class="btn btn-secondary">â†©ï¸ Retour au tableau de bord</a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+            <tr>
+                <th>Date</th>
+                <th>RÃ©fÃ©rence RÃ©servation</th>
+                <th>Vol</th>
+                <th>Passager</th>
+                <th>SiÃ¨ge</th>
+                <th>Montant (â‚¬)</th>
+                <th>MÃ©thode</th>
+                <th>Statut</th>
+            </tr>
+            </thead>
+            <tbody>
+            <% if (payments != null && !payments.isEmpty()) {
+                for (Payment payment : payments) { %>
+            <tr>
+                <td><%= sdf.format(payment.getPaymentDate()) %></td>
+                <td><strong><%= payment.getBooking().getBookingReference() %></strong></td>
+                <td><%= payment.getBooking().getFlight().getFlightNumber() %></td>
+                <td><%= payment.getBooking().getPassenger().getFullName() %></td>
+                <td><span class="badge bg-info"><%= payment.getBooking().getSeatNumber() %></span></td>
+                <td class="text-success"><strong><%= String.format("%.2f", payment.getAmount()) %> â‚¬</strong></td>
+                <td>
+                    <% String method = payment.getPaymentMethod();
+                        String icon = "ðŸ’³";
+                        if ("cash".equals(method)) icon = "ðŸ’µ";
+                        else if ("mobile_money".equals(method)) icon = "ðŸ“±";
+                        else if ("bank_transfer".equals(method)) icon = "ðŸ¦";
+                    %>
+                    <%= icon %> <%= method %>
+                </td>
+                <td>
+                    <% String status = payment.getStatus();
+                        String badgeClass = "paid".equals(status) ? "bg-success" :
+                                "refunded".equals(status) ? "bg-warning" : "bg-danger";
+                    %>
+                    <span class="badge <%= badgeClass %>"><%= status %></span>
+                </td>
+            </tr>
+            <% }
+            } else { %>
+            <tr>
+                <td colspan="8" class="text-center">Aucun paiement enregistrÃ©</td>
+            </tr>
+            <% } %>
+            </tbody>
+        </table>
+    </div>
+
+    <% if (payments != null && !payments.isEmpty()) {
+        double total = 0;
+        for (Payment p : payments) {
+            if ("paid".equals(p.getStatus())) {
+                total += p.getAmount();
+            }
+        }
+    %>
+    <div class="card mt-4">
+        <div class="card-body">
+            <h4>Total des paiements affichÃ©s: <span class="text-success"><%= String.format("%.2f", total) %> â‚¬</span></h4>
+        </div>
+    </div>
+    <% } %>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+
+
+==============================
+FICHIER : D:\ITU\L3\S5\MmeBaovola\compagnie-aerienne\src\main\webapp\WEB-INF\jsp\payments\revenueByFlight.jsp
+==============================
+
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="java.sql.Timestamp" %>
+<%
+    List<Map<String, Object>> flightRevenue = (List<Map<String, Object>>) request.getAttribute("flightRevenue");
+    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+%>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revenus par Vol - GCA Airlines</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<%@ include file="../navbar.jsp" %>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>âœˆï¸ Revenus par Vol</h2>
+        <a href="payments" class="btn btn-secondary">â†©ï¸ Retour</a>
+    </div>
+
+    <div class="row">
+        <% if (flightRevenue != null && !flightRevenue.isEmpty()) {
+            double grandTotal = 0;
+            for (Map<String, Object> row : flightRevenue) {
+                grandTotal += (Double) row.get("totalRevenue");
+            }
+        %>
+
+        <div class="col-md-12 mb-4">
+            <div class="alert alert-info">
+                <h4>Total des revenus: <strong><%= String.format("%.2f", grandTotal) %> â‚¬</strong></h4>
+                <p class="mb-0">Nombre de vols avec revenus: <%= flightRevenue.size() %></p>
+            </div>
+        </div>
+
+        <% for (Map<String, Object> row : flightRevenue) {
+            String flightNumber = (String) row.get("flightNumber");
+            Timestamp departureTime = (Timestamp) row.get("departureTime");
+            String route = (String) row.get("route");
+            int paymentCount = (Integer) row.get("paymentCount");
+            double totalRevenue = (Double) row.get("totalRevenue");
+            double percentage = (totalRevenue / grandTotal) * 100;
+        %>
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <%= flightNumber %> - <%= route %>
+                    </h5>
+                    <small><%= sdf.format(departureTime) %></small>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <p class="mb-1"><strong>Nombre de paiements:</strong></p>
+                            <h4 class="text-primary"><%= paymentCount %></h4>
+                        </div>
+                        <div class="col-6">
+                            <p class="mb-1"><strong>Revenus totaux:</strong></p>
+                            <h4 class="text-success"><%= String.format("%.2f", totalRevenue) %> â‚¬</h4>
+                        </div>
+                    </div>
+                    <div class="progress mt-2">
+                        <div class="progress-bar bg-success" role="progressbar"
+                             style="width: <%= percentage %>%"
+                             aria-valuenow="<%= percentage %>" aria-valuemin="0" aria-valuemax="100">
+                            <%= String.format("%.1f", percentage) %>%
+                        </div>
+                    </div>
+                    <small class="text-muted">
+                        Moyenne par paiement: <%= String.format("%.2f", totalRevenue / paymentCount) %> â‚¬
+                    </small>
+                </div>
+            </div>
+        </div>
+        <% }
+        } else { %>
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                Aucun revenu enregistrÃ© pour le moment.
+            </div>
+        </div>
+        <% } %>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+
+
+==============================
+FICHIER : D:\ITU\L3\S5\MmeBaovola\compagnie-aerienne\src\main\webapp\WEB-INF\jsp\payments\revenueByMonth.jsp
+==============================
+
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.Map" %>
+<%
+    List<Map<String, Object>> monthlyRevenue = (List<Map<String, Object>>) request.getAttribute("monthlyRevenue");
+    String[] monthNames = {"", "Janvier", "FÃ©vrier", "Mars", "Avril", "Mai", "Juin",
+            "Juillet", "AoÃ»t", "Septembre", "Octobre", "Novembre", "DÃ©cembre"};
+%>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revenus par Mois - GCA Airlines</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<%@ include file="../navbar.jsp" %>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>ðŸ“… Revenus par Mois</h2>
+        <a href="payments" class="btn btn-secondary">â†©ï¸ Retour</a>
+    </div>
+
+    <% if (monthlyRevenue != null && !monthlyRevenue.isEmpty()) {
+        double grandTotal = 0;
+        int totalPayments = 0;
+        for (Map<String, Object> row : monthlyRevenue) {
+            grandTotal += (Double) row.get("totalRevenue");
+            totalPayments += (Integer) row.get("paymentCount");
+        }
+    %>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-success">
+                <div class="card-body text-center">
+                    <h6>Total des Revenus</h6>
+                    <h3><%= String.format("%.2f", grandTotal) %> â‚¬</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-primary">
+                <div class="card-body text-center">
+                    <h6>Total des Paiements</h6>
+                    <h3><%= totalPayments %></h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-info">
+                <div class="card-body text-center">
+                    <h6>Moyenne Mensuelle</h6>
+                    <h3><%= String.format("%.2f", grandTotal / monthlyRevenue.size()) %> â‚¬</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+            <tr>
+                <th>PÃ©riode</th>
+                <th>Nombre de Paiements</th>
+                <th>Revenus Totaux (â‚¬)</th>
+                <th>Moyenne par Paiement (â‚¬)</th>
+                <th>% du Total</th>
+                <th>Visualisation</th>
+            </tr>
+            </thead>
+            <tbody>
+            <% for (Map<String, Object> row : monthlyRevenue) {
+                int year = (Integer) row.get("year");
+                int month = (Integer) row.get("month");
+                int paymentCount = (Integer) row.get("paymentCount");
+                double totalRevenue = (Double) row.get("totalRevenue");
+                double avgRevenue = totalRevenue / paymentCount;
+                double percentage = (totalRevenue / grandTotal) * 100;
+            %>
+            <tr>
+                <td><strong><%= monthNames[month] %> <%= year %></strong></td>
+                <td><%= paymentCount %></td>
+                <td class="text-success"><strong><%= String.format("%.2f", totalRevenue) %></strong></td>
+                <td><%= String.format("%.2f", avgRevenue) %></td>
+                <td><%= String.format("%.1f", percentage) %>%</td>
+                <td>
+                    <div class="progress" style="height: 25px;">
+                        <div class="progress-bar bg-success" role="progressbar"
+                             style="width: <%= percentage %>%"
+                             aria-valuenow="<%= percentage %>" aria-valuemin="0" aria-valuemax="100">
+                            <%= String.format("%.0f", percentage) %>%
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <% } %>
+            </tbody>
+            <tfoot class="table-light">
+            <tr>
+                <th>TOTAL</th>
+                <th><%= totalPayments %></th>
+                <th class="text-success"><strong><%= String.format("%.2f", grandTotal) %> â‚¬</strong></th>
+                <th><%= String.format("%.2f", grandTotal / totalPayments) %></th>
+                <th>100%</th>
+                <th></th>
+            </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <% } else { %>
+    <div class="alert alert-info">
+        Aucun revenu enregistrÃ© pour le moment.
+    </div>
+    <% } %>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+
+

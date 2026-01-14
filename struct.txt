@@ -1,0 +1,257 @@
+﻿Structure du dossier pour le volume Nouveau nom
+Le numÚro de sÚrie du volume est D2E3-6693
+D:\ITU\L3\S5\MMEBAOVOLA\COMPAGNIE-AERIENNE
+ª   deploy.sh
+ª   sources.txt
+ª   struct.txt
+ª   win_combine_java.ps1
+ª   
++---build
+ª   ª   GCA.war
+ª   ª   index.html
+ª   ª   index.jsp
+ª   ª   
+ª   +---WEB-INF
+ª       ª   web.xml
+ª       ª   
+ª       +---classes
+ª       ª   +---main
+ª       ª       +---project
+ª       ª           +---beans
+ª       ª           ª       Aircraft.class
+ª       ª           ª       Airport.class
+ª       ª           ª       Booking.class
+ª       ª           ª       Employee.class
+ª       ª           ª       Flight.class
+ª       ª           ª       FlightInstance.class
+ª       ª           ª       FlightRoute.class
+ª       ª           ª       Passenger.class
+ª       ª           ª       Payment.class
+ª       ª           ª       
+ª       ª           +---filters
+ª       ª           ª       AuthFilter.class
+ª       ª           ª       
+ª       ª           +---servlets
+ª       ª           ª       BookingServlet.class
+ª       ª           ª       DashboardServlet.class
+ª       ª           ª       FlightInstanceServlet.class
+ª       ª           ª       FlightServlet.class
+ª       ª           ª       LoginServlet.class
+ª       ª           ª       LogoutServlet.class
+ª       ª           ª       PaymentServlet.class
+ª       ª           ª       
+ª       ª           +---utils
+ª       ª                   DBConnection.class
+ª       ª                   
+ª       +---jsp
+ª       ª   ª   dashboard.jsp
+ª       ª   ª   login.jsp
+ª       ª   ª   navbar.jsp
+ª       ª   ª   
+ª       ª   +---bookings
+ª       ª   ª       listBookings.jsp
+ª       ª   ª       newBooking.jsp
+ª       ª   ª       selectFlight.jsp
+ª       ª   ª       
+ª       ª   +---flights
+ª       ª   ª       addFlight.jsp
+ª       ª   ª       addFlightInstance.jsp
+ª       ª   ª       addFlightRoute.jsp
+ª       ª   ª       editFlight.jsp
+ª       ª   ª       flight-bookings.jsp
+ª       ª   ª       listFlightInstances.jsp
+ª       ª   ª       listFlightRoutes.jsp
+ª       ª   ª       listFlights.jsp
+ª       ª   ª       
+ª       ª   +---payments
+ª       ª           dashboard.jsp
+ª       ª           listPayments.jsp
+ª       ª           revenueByFlight.jsp
+ª       ª           revenueByMonth.jsp
+ª       ª           
+ª       +---lib
+ª               annotations-api.jar
+ª               catalina-ant.jar
+ª               catalina-ha.jar
+ª               catalina-ssi.jar
+ª               catalina-storeconfig.jar
+ª               catalina-tribes.jar
+ª               catalina.jar
+ª               ecj-4.36.jar
+ª               el-api.jar
+ª               jakartaee-migration-1.0.9-shaded.jar
+ª               jasper-el.jar
+ª               jasper.jar
+ª               jaspic-api.jar
+ª               jsp-api.jar
+ª               mysql-connector-java-9.5.0.jar
+ª               postgresql-42.7.7.jar
+ª               servlet-api.jar
+ª               tomcat-api.jar
+ª               tomcat-coyote-ffm.jar
+ª               tomcat-coyote.jar
+ª               tomcat-dbcp.jar
+ª               tomcat-i18n-cs.jar
+ª               tomcat-i18n-de.jar
+ª               tomcat-i18n-es.jar
+ª               tomcat-i18n-fr.jar
+ª               tomcat-i18n-ja.jar
+ª               tomcat-i18n-ko.jar
+ª               tomcat-i18n-pt-BR.jar
+ª               tomcat-i18n-ru.jar
+ª               tomcat-i18n-zh-CN.jar
+ª               tomcat-jdbc.jar
+ª               tomcat-jni.jar
+ª               tomcat-util-scan.jar
+ª               tomcat-util.jar
+ª               tomcat-websocket.jar
+ª               websocket-api.jar
+ª               websocket-client-api.jar
+ª               
++---lib
+ª       annotations-api.jar
+ª       catalina-ant.jar
+ª       catalina-ha.jar
+ª       catalina-ssi.jar
+ª       catalina-storeconfig.jar
+ª       catalina-tribes.jar
+ª       catalina.jar
+ª       ecj-4.36.jar
+ª       el-api.jar
+ª       jakartaee-migration-1.0.9-shaded.jar
+ª       jasper-el.jar
+ª       jasper.jar
+ª       jaspic-api.jar
+ª       jsp-api.jar
+ª       mysql-connector-java-9.5.0.jar
+ª       postgresql-42.7.7.jar
+ª       servlet-api.jar
+ª       tomcat-api.jar
+ª       tomcat-coyote-ffm.jar
+ª       tomcat-coyote.jar
+ª       tomcat-dbcp.jar
+ª       tomcat-i18n-cs.jar
+ª       tomcat-i18n-de.jar
+ª       tomcat-i18n-es.jar
+ª       tomcat-i18n-fr.jar
+ª       tomcat-i18n-ja.jar
+ª       tomcat-i18n-ko.jar
+ª       tomcat-i18n-pt-BR.jar
+ª       tomcat-i18n-ru.jar
+ª       tomcat-i18n-zh-CN.jar
+ª       tomcat-jdbc.jar
+ª       tomcat-jni.jar
+ª       tomcat-util-scan.jar
+ª       tomcat-util.jar
+ª       tomcat-websocket.jar
+ª       websocket-api.jar
+ª       websocket-client-api.jar
+ª       
++---sql
+ª       data.sql
+ª       script.sql
+ª       
++---src
+    +---main
+        +---project
+        ª   +---beans
+        ª   ª       Aircraft.java
+        ª   ª       Airport.java
+        ª   ª       beans.txt
+        ª   ª       Booking.java
+        ª   ª       Employee.java
+        ª   ª       Flight.java
+        ª   ª       FlightInstance.java
+        ª   ª       FlightRoute.java
+        ª   ª       Passenger.java
+        ª   ª       Payment.java
+        ª   ª       
+        ª   +---filters
+        ª   ª       AuthFilter.java
+        ª   ª       
+        ª   +---servlets
+        ª   ª       BookingServlet.java
+        ª   ª       DashboardServlet.java
+        ª   ª       FlightInstanceServlet.java
+        ª   ª       FlightServlet.java
+        ª   ª       LoginServlet.java
+        ª   ª       LogoutServlet.java
+        ª   ª       PaymentServlet.java
+        ª   ª       
+        ª   +---utils
+        ª           DBConnection.java
+        ª           
+        +---webapp
+            ª   index.html
+            ª   index.jsp
+            ª   jsps.txt
+            ª   struct.txt
+            ª   
+            +---WEB-INF
+                ª   web.xml
+                ª   
+                +---jsp
+                ª   ª   dashboard.jsp
+                ª   ª   login.jsp
+                ª   ª   navbar.jsp
+                ª   ª   
+                ª   +---bookings
+                ª   ª       listBookings.jsp
+                ª   ª       newBooking.jsp
+                ª   ª       selectFlight.jsp
+                ª   ª       
+                ª   +---flights
+                ª   ª       addFlight.jsp
+                ª   ª       addFlightInstance.jsp
+                ª   ª       addFlightRoute.jsp
+                ª   ª       editFlight.jsp
+                ª   ª       flight-bookings.jsp
+                ª   ª       listFlightInstances.jsp
+                ª   ª       listFlightRoutes.jsp
+                ª   ª       listFlights.jsp
+                ª   ª       
+                ª   +---payments
+                ª           dashboard.jsp
+                ª           listPayments.jsp
+                ª           revenueByFlight.jsp
+                ª           revenueByMonth.jsp
+                ª           
+                +---lib
+                        annotations-api.jar
+                        catalina-ant.jar
+                        catalina-ha.jar
+                        catalina-ssi.jar
+                        catalina-storeconfig.jar
+                        catalina-tribes.jar
+                        catalina.jar
+                        ecj-4.36.jar
+                        el-api.jar
+                        jakartaee-migration-1.0.9-shaded.jar
+                        jasper-el.jar
+                        jasper.jar
+                        jaspic-api.jar
+                        jsp-api.jar
+                        mysql-connector-java-9.5.0.jar
+                        postgresql-42.7.7.jar
+                        servlet-api.jar
+                        tomcat-api.jar
+                        tomcat-coyote-ffm.jar
+                        tomcat-coyote.jar
+                        tomcat-dbcp.jar
+                        tomcat-i18n-cs.jar
+                        tomcat-i18n-de.jar
+                        tomcat-i18n-es.jar
+                        tomcat-i18n-fr.jar
+                        tomcat-i18n-ja.jar
+                        tomcat-i18n-ko.jar
+                        tomcat-i18n-pt-BR.jar
+                        tomcat-i18n-ru.jar
+                        tomcat-i18n-zh-CN.jar
+                        tomcat-jdbc.jar
+                        tomcat-jni.jar
+                        tomcat-util-scan.jar
+                        tomcat-util.jar
+                        tomcat-websocket.jar
+                        websocket-api.jar
+                        websocket-client-api.jar
+                        

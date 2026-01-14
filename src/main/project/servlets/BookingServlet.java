@@ -335,12 +335,12 @@ public class BookingServlet extends HttpServlet {
             }
 
             if (successCount > 0) {
-                String msg = "✅ " + successCount + " réservation(s) créée(s)";
+                String msg = successCount + " réservation(s) créée(s)";
                 if (!bookingRefs.isEmpty()) msg += " | Réf: " + String.join(", ", bookingRefs);
-                if (failCount > 0) msg += " ⚠️ (" + failCount + " échec(s))";
+                if (failCount > 0) msg += " (" + failCount + " échec(s))";
                 session.setAttribute("successMessage", msg);
             }
-            if (failCount > 0 && successCount == 0) session.setAttribute("errorMessage", "❌ Échec: " + errorDetails.toString());
+            if (failCount > 0 && successCount == 0) session.setAttribute("errorMessage", " Échec: " + errorDetails.toString());
 
             response.sendRedirect("bookings");
 

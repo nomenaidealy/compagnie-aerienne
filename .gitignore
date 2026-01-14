@@ -1,0 +1,53 @@
+# Build and compiled files
+build/
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# Dependencies
+lib/
+*.jar
+!lib/*.jar
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# VS Code
+.vscode/
+launch.json
+tasks.json
+
+# OS files
+.DS_Store
+Thumbs.db
+*.log
+
+# Maven
+.m2/
+.maven/
+
+# Gradle
+.gradle/
+gradle/
+
+# Temporary files
+*.tmp
+*.bak
+*~
+
+# Node (if used for frontend)
+node_modules/
+npm-debug.log
